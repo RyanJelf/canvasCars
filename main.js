@@ -5,6 +5,8 @@ let btnstart = document.getElementById("start");
 //calling on canvas drawing API
 let ctx = canvas.getContext("2d");
 
+var raceFinished = false;
+
 //event listener to start race when button is clicked
 btnstart.addEventListener("click", race);
 
@@ -13,9 +15,6 @@ function random(min, max) {
   //return random value in range min - max
   return num = Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-
-
 
 //array created to place cars into to use for for loop on line 36
 let cars = [];
@@ -27,35 +26,35 @@ let win = [CarNum[0], CarNum[1], CarNum[2], CarNum[3]];
 //function to specify car parameters if different from the constructor
 function createCar() {
 
-  fetch("https://www.colr.org/json/colors/random/15").then(function (response) {
+  fetch("https://www.colr.org/json/colors/random/30").then(function (response) {
     response.json().then(function (json) {
 
       if (ctx) {
 
         cars.push(new Car({
           number: CarNum[0],
-          colour: "#" + json.colors[cars.length].hex,
+          colour: "#" + json.colors[cars.length + random(1, 15)].hex,
           window: "#" + json.colors[cars.length + random(1, 15)].hex
         }));
 
         cars.push(new Car({
           y: 150,
           number: CarNum[1],
-          colour: "#" + json.colors[cars.length].hex,
+          colour: "#" + json.colors[cars.length + random(1, 15)].hex,
           window: "#" + json.colors[cars.length + random(1, 15)].hex
         }));
 
         cars.push(new Car({
           y: 300,
           number: CarNum[2],
-          colour: "#" + json.colors[cars.length].hex,
+          colour: "#" + json.colors[cars.length + random(1, 15)].hex,
           window: "#" + json.colors[cars.length + random(1, 15)].hex
         }));
 
         cars.push(new Car({
           y: 450,
           number: CarNum[3],
-          colour: "#" + json.colors[cars.length].hex,
+          colour: "#" + json.colors[cars.length + random(1, 15)].hex,
           window: "#" + json.colors[cars.length + random(1, 15)].hex
         }));
 
@@ -82,7 +81,6 @@ class Car {
     this.finish = canvas.width || 700;
 
   }
-
 
   //drawCar car using constructor values unless otherwise specified
   drawCar() {
@@ -142,7 +140,8 @@ class Car {
     //increment velocity
     this.x += this.speed;
     // if car reaches end of canvas stop race and declare winner
-    if (this.x + this.speed >= this.finish) {
+    if (this.x + this.speed == this.finish) {
+      raceFinished = true;
       this.x = this.finish;
       this.speed = this.x;
 
@@ -150,9 +149,7 @@ class Car {
 
       alert(`Race Complete!\n\nThe winner is: Number ${win[this.number -1]}`);
 
-      document.location.reload();
     }
-
 
 
   }
@@ -160,19 +157,19 @@ class Car {
 }
 
 
-
 //for loop to start race and move cars
 function race() {
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (raceFinished == false) {
 
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].drawCar();
-    cars[i].move();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < cars.length; i++) {
+      cars[i].drawCar();
+      cars[i].move();
+    }
+    requestAnimationFrame(race);
   }
-
-  requestAnimationFrame(race);
-
 }
 
 //loads cars up onto canvas
